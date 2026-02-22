@@ -1,0 +1,37 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is admin or dev
+    function isStaff() {
+      return request.auth != null && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'dev');
+    }
+
+    // Collection: users
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if isStaff();
+    }
+
+    // Collection: templates
+    match /templates/{templateId} {
+      allow read: if resource.data.aktif == true || isStaff();
+      allow write: if isStaff();
+    }
+
+    // Collection: surat_requests
+    match /surat_requests/{requestId} {
+      allow create: if true; // Public can submit
+      allow read, update, delete: if isStaff();
+      allow read: if false; // Public cannot read
+    }
+
+    // Collection: counters
+    match /counters/{counterId} {
+      allow read, write: if isStaff();
+    }
+  }
+}

@@ -1,17 +1,52 @@
-# sipintar
+# Walkthrough - Sistem Administrasi Surat Desa
 
-A new Flutter project.
+A production-ready Village Letter Administration System built with Flutter and Firebase.
 
-## Getting Started
+## Key Features Implemented
 
-This project is a starting point for a Flutter application.
+### 👤 User Flow (Anonymous)
+- **Landing Page**: Modern grid layout showing available letter templates.
+- **QR Flow**: Clicking a template generates a QR code. Scanning the QR opens the request form.
+- **Dynamic Form**: Users input KTP/KK data which is saved as `pending` to Firestore.
 
-A few resources to get you started if this is your first Flutter project:
+### 👨💼 Admin & Dev Flow
+- **Google Login**: Secure authentication for village staff.
+- **Role Guard**: Access control for Admin and Dev roles.
+- **Responsive Dashboard**:
+  - **Web**: Sidebar NavigationRail.
+  - **Mobile**: Bottom NavigationBar.
+  - Real-time badges for pending requests.
+- **Template Management**: Real `.docx` upload using `file_picker` and Firestore metadata.
+- **Edit Before Approve**: Admins can edit user-submitted data directly in the dashboard before generating the final document.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 📄 Approval Logic (Core Business)
+- **Automatic Numbering**: Uses **Firestore Transaction** to prevent duplicate numbers.
+  - Format: `140/{noUrut}/DS-SKM/{bulanRomawi}/{tahun}`
+- **Docx Generation**: Generates the final letter in memory using the template and user data.
+- **WhatsApp Integration**: Automatically redirects to WhatsApp with a pre-filled message (Approved/Rejected).
+
+## Technical Implementation Highlights
+
+- **Clean Architecture**: Separation of Data, Domain, and Presentation layers.
+- **State Management**: Consistently used **Riverpod**.
+- **Responsive UI**: Custom `ResponsiveLayout` and `MediaQuery` for adaptive grids.
+- **Security**: Production-ready **Firestore Rules** restricting public read access.
+
+## How to Run
+
+1.  **Firebase Setup**:
+    - Create a Firebase project.
+    - Enable Google Auth, Firestore, and Storage.
+    - Add `google-services.json` to `android/app/` and Firebase config to Web.
+2.  **Initialize Proj**:
+    ```bash
+    flutter pub get
+    flutter run
+    ```
+
+## Code Landmarks
+- [lib/main.dart](file:///h:/FlutterProject/sipintar/lib/main.dart): App entry and entry point guard.
+- [lib/features/surat/data/surat_repository_impl.dart](file:///h:/FlutterProject/sipintar/lib/features/surat/data/surat_repository_impl.dart): Logic for automatic numbering.
+- [lib/core/utils/docx_helper.dart](file:///h:/FlutterProject/sipintar/lib/core/utils/docx_helper.dart): Docx generation from memory.
+- [lib/shared/widgets/request_detail_dialog.dart](file:///h:/FlutterProject/sipintar/lib/shared/widgets/request_detail_dialog.dart): Main approval UI flow.
